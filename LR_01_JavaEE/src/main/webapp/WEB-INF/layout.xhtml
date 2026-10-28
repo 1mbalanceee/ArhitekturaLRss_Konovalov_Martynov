@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core" xmlns:ui="jakarta.faces.facelets" lang="ru">
+<f:view locale="ru">
+    <h:head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title><ui:insert name="title">Ювелирный магазин</ui:insert> — Ювелирный магазин</title>
+        <h:outputStylesheet library="css" name="style.css"/>
+    </h:head>
+    <h:body>
+        <header>
+            <strong>Ювелирный магазин</strong>
+            <nav aria-label="Разделы">
+                <h:link outcome="/products" value="Изделия"/>
+                <h:link outcome="/categories" value="Категории"/>
+            </nav>
+        </header>
+        <main>
+            <h1><ui:insert name="title"/></h1>
+            <h:messages id="messages" styleClass="messages" infoClass="success" errorClass="error"/>
+            <ui:insert name="content"/>
+        </main>
+        <footer>Практическая работа №1 · Коновалов Павел, 6131 · Мартынов Олег, 6133</footer>
+    </h:body>
+</f:view>
+</html>

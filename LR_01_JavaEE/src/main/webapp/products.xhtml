@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core" xmlns:ui="jakarta.faces.facelets" template="/WEB-INF/layout.xhtml">
+    <ui:define name="title">Изделия</ui:define>
+    <ui:define name="content">
+        <h:panelGroup rendered="#{empty productView.categories}">
+            <p>Для добавления изделий сначала <h:link outcome="/categories" value="создайте категорию"/>.</p>
+        </h:panelGroup>
+        <h2>#{empty productView.selected.id ? 'Добавить изделие' : 'Редактировать изделие'}</h2>
+        <p class="hint">* — обязательные поля. Вес — в граммах, цена — в рублях. Дробная часть — через запятую или точку.</p>
+        <h:form id="editor">
+            <div class="fields">
+                <div>
+                    <h:outputLabel for="sku" value="Артикул *"/>
+                    <h:inputText id="sku" value="#{productView.selected.sku}" required="true" maxlength="40"
+                                 requiredMessage="Введите артикул"/>
+                </div>
+                <div>
+                    <h:outputLabel for="name" value="Название *"/>
+                    <h:inputText id="name" value="#{productView.selected.name}" required="true" maxlength="150"
+                                 requiredMessage="Введите название изделия"/>
+                </div>
+                <div>
+                    <h:outputLabel for="category" value="Категория *"/>
+                    <h:selectOneMenu id="category" value="#{productView.categoryId}" required="true" requiredMessage="Выберите категорию">
+                        <f:selectItem itemLabel="Выберите категорию" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{productView.categories}" var="category" itemValue="#{category.id}" itemLabel="#{category.name}"/>
+                    </h:selectOneMenu>
+                </div>
+                <div>
+                    <h:outputLabel for="metal" value="Металл *"/>
+                    <h:inputText id="metal" value="#{productView.selected.metal}" required="true" maxlength="50"
+                                 requiredMessage="Укажите металл"/>
+                </div>
+                <div>
+                    <h:outputLabel for="fineness" value="Проба (1–999) *"/>
+                    <h:inputText id="fineness" value="#{productView.selected.fineness}" required="true" requiredMessage="Укажите пробу"
+                                 converterMessage="Проба должна быть целым числом"/>
+                </div>
+                <div>
+                    <h:outputLabel for="weight" value="Вес, г *"/>
+                    <h:inputText id="weight" value="#{productView.selected.weightGrams}" required="true" requiredMessage="Укажите вес"
+                                 converterMessage="Введите вес числом с запятой">
+                        <f:converter converterId="decimal"/>
+                    </h:inputText>
+                </div>
+                <div>
+                    <h:outputLabel for="price" value="Цена, ₽ *"/>
+                    <h:inputText id="price" value="#{productView.selected.price}" required="true" requiredMessage="Укажите цену"
+                                 converterMessage="Введите цену числом с запятой">
+                        <f:converter converterId="decimal"/>
+                    </h:inputText>
+                </div>
+                <div>
+                    <h:outputLabel for="stock" value="Остаток, шт. *"/>
+                    <h:inputText id="stock" value="#{productView.selected.stock}" required="true" requiredMessage="Укажите остаток"
+                                 converterMessage="Остаток должен быть целым числом"/>
+                </div>
+            </div>
+            <div class="actions">
+                <h:commandButton id="save" value="Сохранить" action="#{productView.save}" disabled="#{empty productView.categories}"/>
+                <h:commandButton id="cancel" value="Отмена" action="#{productView.cancel}" immediate="true" styleClass="secondary"/>
+            </div>
+        </h:form>
+        <h2>Список изделий</h2>
+        <h:panelGroup rendered="#{empty productView.products}"><p>Изделий пока нет.</p></h:panelGroup>
+        <h:form id="list" rendered="#{not empty productView.products}">
+            <div class="table-wrap">
+                <h:dataTable id="products" value="#{productView.products}" var="product">
+                    <h:column><f:facet name="header">Артикул</f:facet>#{product.sku}</h:column>
+                    <h:column><f:facet name="header">Название</f:facet><h:outputText value="#{product.name}"/></h:column>
+                    <h:column><f:facet name="header">Категория</f:facet><h:outputText value="#{product.category.name}"/></h:column>
+                    <h:column><f:facet name="header">Металл</f:facet><h:outputText value="#{product.metal}"/></h:column>
+                    <h:column><f:facet name="header">Проба</f:facet>#{product.fineness}</h:column>
+                    <h:column><f:facet name="header">Вес, г</f:facet>
+                        <h:outputText value="#{product.weightGrams}"><f:convertNumber locale="ru" groupingUsed="false" maxFractionDigits="3"/></h:outputText>
+                    </h:column>
+                    <h:column><f:facet name="header">Цена, ₽</f:facet>
+                        <h:outputText value="#{product.price}"><f:convertNumber locale="ru" minFractionDigits="2" maxFractionDigits="2"/></h:outputText>
+                    </h:column>
+                    <h:column><f:facet name="header">Остаток</f:facet>#{product.stock}</h:column>
+                    <h:column><f:facet name="header">Действия</f:facet>
+                        <div class="actions">
+                            <h:commandButton id="edit" value="Изменить" action="#{productView.edit(product)}" styleClass="secondary"/>
+                            <h:commandButton id="delete" value="Удалить" action="#{productView.delete(product)}" styleClass="danger"
+                                             onclick="return confirm('Удалить изделие?');"/>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

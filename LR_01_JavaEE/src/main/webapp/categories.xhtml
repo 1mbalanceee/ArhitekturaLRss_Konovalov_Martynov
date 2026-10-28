@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core" xmlns:ui="jakarta.faces.facelets" template="/WEB-INF/layout.xhtml">
+    <ui:define name="title">Категории</ui:define>
+    <ui:define name="content">
+        <h2>#{empty categoryView.selected.id ? 'Добавить категорию' : 'Редактировать категорию'}</h2>
+        <h:form id="editor">
+            <div class="fields">
+                <div>
+                    <h:outputLabel for="name" value="Название *"/>
+                    <h:inputText id="name" value="#{categoryView.selected.name}" required="true" maxlength="100"
+                                 requiredMessage="Введите название категории"/>
+                </div>
+                <div>
+                    <h:outputLabel for="description" value="Описание"/>
+                    <h:inputTextarea id="description" value="#{categoryView.selected.description}" rows="2"/>
+                </div>
+            </div>
+            <div class="actions">
+                <h:commandButton id="save" value="Сохранить" action="#{categoryView.save}"/>
+                <h:commandButton id="cancel" value="Отмена" action="#{categoryView.cancel}" immediate="true" styleClass="secondary"/>
+            </div>
+        </h:form>
+        <h2>Список категорий</h2>
+        <h:panelGroup rendered="#{empty categoryView.categories}"><p>Категорий пока нет.</p></h:panelGroup>
+        <h:form id="list" rendered="#{not empty categoryView.categories}">
+            <div class="table-wrap">
+                <h:dataTable id="categories" value="#{categoryView.categories}" var="category">
+                    <h:column><f:facet name="header">ID</f:facet>#{category.id}</h:column>
+                    <h:column><f:facet name="header">Название</f:facet><h:outputText value="#{category.name}"/></h:column>
+                    <h:column><f:facet name="header">Описание</f:facet><h:outputText value="#{category.description}"/></h:column>
+                    <h:column>
+                        <f:facet name="header">Действия</f:facet>
+                        <div class="actions">
+                            <h:commandButton id="edit" value="Изменить" action="#{categoryView.edit(category)}" styleClass="secondary"/>
+                            <h:commandButton id="delete" value="Удалить" action="#{categoryView.delete(category)}" styleClass="danger"
+                                             onclick="return confirm('Удалить категорию?');"/>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
