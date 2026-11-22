@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: page('Ошибка', '', ~{::section})}">
+<body>
+<section>
+    <p class="message error" role="alert"
+       th:text="${message ?: 'Страница недоступна. Проверьте адрес или повторите действие позже'}"></p>
+    <p><a th:href="@{/products}">К списку изделий</a> | <a th:href="@{/categories}">К списку категорий</a></p>
+</section>
+</body>
+</html>

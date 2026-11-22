@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: page('Изделия', 'products', ~{::section})}">
+<body>
+<section>
+    <p th:if="${#lists.isEmpty(categories)}">Для добавления изделий сначала <a th:href="@{/categories}">создайте категорию</a>.</p>
+    <h2 th:text="${form.id == null ? 'Добавить изделие' : 'Редактировать изделие'}">Добавить изделие</h2>
+    <p class="hint">* - обязательные поля. Вес - в граммах, цена - в рублях. Дробная часть - через запятую или точку, без разделителей тысяч.</p>
+    <form th:action="@{/products/save}" th:object="${form}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{version}">
+        <div class="message error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+        </div>
+        <p class="field-error" th:errors="*{id}"></p>
+        <p class="field-error" th:errors="*{version}"></p>
+        <div class="fields">
+            <div>
+                <label for="sku">Артикул *</label>
+                <input type="text" maxlength="40" required th:field="*{sku}" th:errorclass="invalid" aria-describedby="sku-error">
+                <p id="sku-error" class="field-error" th:errors="*{sku}"></p>
+            </div>
+            <div>
+                <label for="name">Название *</label>
+                <input type="text" maxlength="150" required th:field="*{name}" th:errorclass="invalid" aria-describedby="name-error">
+                <p id="name-error" class="field-error" th:errors="*{name}"></p>
+            </div>
+            <div>
+                <label for="categoryId">Категория *</label>
+                <select th:field="*{categoryId}" required th:errorclass="invalid" aria-describedby="categoryId-error">
+                    <option value="">Выберите категорию</option>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select>
+                <p id="categoryId-error" class="field-error" th:errors="*{categoryId}"></p>
+            </div>
+            <div>
+                <label for="metal">Металл *</label>
+                <input type="text" maxlength="50" required th:field="*{metal}" th:errorclass="invalid" aria-describedby="metal-error">
+                <p id="metal-error" class="field-error" th:errors="*{metal}"></p>
+            </div>
+            <div>
+                <label for="fineness">Проба (1-999) *</label>
+                <input type="text" inputmode="numeric" required th:field="*{fineness}" th:errorclass="invalid" aria-describedby="fineness-error">
+                <p id="fineness-error" class="field-error" th:errors="*{fineness}"></p>
+            </div>
+            <div>
+                <label for="weightGrams">Вес, г *</label>
+                <input type="text" inputmode="decimal" required th:field="*{weightGrams}" th:errorclass="invalid" aria-describedby="weightGrams-error">
+                <p id="weightGrams-error" class="field-error" th:errors="*{weightGrams}"></p>
+            </div>
+            <div>
+                <label for="price">Цена, ₽ *</label>
+                <input type="text" inputmode="decimal" required th:field="*{price}" th:errorclass="invalid" aria-describedby="price-error">
+                <p id="price-error" class="field-error" th:errors="*{price}"></p>
+            </div>
+            <div>
+                <label for="stock">Остаток, шт. *</label>
+                <input type="text" inputmode="numeric" required th:field="*{stock}" th:errorclass="invalid" aria-describedby="stock-error">
+                <p id="stock-error" class="field-error" th:errors="*{stock}"></p>
+            </div>
+        </div>
+        <div class="actions">
+            <button type="submit" th:disabled="${#lists.isEmpty(categories)}">Сохранить</button>
+            <a class="button secondary" th:href="@{/products}">Отмена</a>
+        </div>
+    </form>
+    <h2>Список изделий</h2>
+    <p th:if="${#lists.isEmpty(products)}">Изделий пока нет.</p>
+    <div class="table-wrap" th:unless="${#lists.isEmpty(products)}">
+        <table>
+            <caption class="visually-hidden">Ювелирные изделия</caption>
+            <thead><tr>
+                <th scope="col">Артикул</th><th scope="col">Название</th><th scope="col">Категория</th>
+                <th scope="col">Металл</th><th scope="col">Проба</th><th scope="col">Вес, г</th>
+                <th scope="col">Цена, ₽</th><th scope="col">Остаток</th><th scope="col">Действия</th>
+            </tr></thead>
+            <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.sku}"></td>
+                <td th:text="${product.name}"></td>
+                <td th:text="${product.categoryName}"></td>
+                <td th:text="${product.metal}"></td>
+                <td th:text="${product.fineness}"></td>
+                <td class="number" th:text="${#numbers.formatDecimal(product.weightGrams, 1, 'NONE', 3, 'COMMA')}"></td>
+                <td class="number" th:text="${#numbers.formatDecimal(product.price, 1, 'NONE', 2, 'COMMA')}"></td>
+                <td th:text="${product.stock}"></td>
+                <td>
+                    <div class="actions">
+                        <a class="button secondary" th:href="@{/products/{id}/edit(id=${product.id})}">Изменить</a>
+                        <form th:action="@{/products/{id}/delete(id=${product.id})}" method="post" data-confirm="Удалить изделие?">
+                            <input type="hidden" name="version" th:value="${product.version}">
+                            <button class="danger" type="submit">Удалить</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
