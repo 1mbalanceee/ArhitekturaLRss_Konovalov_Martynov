@@ -1,0 +1,47 @@
+name: jewelry-lab2
+services:
+  db:
+    image: postgres:17.6
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-jewelry}
+      POSTGRES_USER: ${POSTGRES_USER:-jewelry}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C.UTF-8"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:${APP_PORT:-8081}:8080"
+    environment:
+      SERVER_PORT: "8080"
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-jewelry}
+      DB_USER: ${POSTGRES_USER:-jewelry}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -ec
+        - |
+          exec 3<>/dev/tcp/127.0.0.1/8080
+          printf 'GET /products HTTP/1.0\r\nHost: localhost\r\n\r\n' >&3
+          IFS= read -r -t 8 status <&3
+          [[ "$$status" == *' 200 '* ]]
+      interval: 15s
+      timeout: 12s
+      start_period: 45s
+      retries: 10
+    restart: unless-stopped
+volumes:
+  postgres-data:

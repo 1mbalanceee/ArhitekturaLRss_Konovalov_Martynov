@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: page('Категории', 'categories', ~{::section})}">
+<body>
+<section>
+    <h2 th:text="${form.id == null ? 'Добавить категорию' : 'Редактировать категорию'}">Добавить категорию</h2>
+    <p class="hint">* - обязательное поле.</p>
+    <form th:action="@{/categories/save}" th:object="${form}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{version}">
+        <div class="message error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+        </div>
+        <p class="field-error" th:errors="*{id}"></p>
+        <p class="field-error" th:errors="*{version}"></p>
+        <div class="fields category-fields">
+            <div>
+                <label for="name">Название *</label>
+                <input type="text" th:field="*{name}" maxlength="100" required th:errorclass="invalid" aria-describedby="name-error">
+                <p id="name-error" class="field-error" th:errors="*{name}"></p>
+            </div>
+            <div>
+                <label for="description">Описание</label>
+                <textarea th:field="*{description}" maxlength="500" rows="2" th:errorclass="invalid" aria-describedby="description-error"></textarea>
+                <p id="description-error" class="field-error" th:errors="*{description}"></p>
+            </div>
+        </div>
+        <div class="actions">
+            <button type="submit">Сохранить</button>
+            <a class="button secondary" th:href="@{/categories}">Отмена</a>
+        </div>
+    </form>
+    <h2>Список категорий</h2>
+    <p th:if="${#lists.isEmpty(categories)}">Категорий пока нет.</p>
+    <div class="table-wrap" th:unless="${#lists.isEmpty(categories)}">
+        <table>
+            <caption class="visually-hidden">Категории ювелирных изделий</caption>
+            <thead><tr><th scope="col">ID</th><th scope="col">Название</th><th scope="col">Описание</th><th scope="col">Действия</th></tr></thead>
+            <tbody>
+            <tr th:each="category : ${categories}">
+                <td th:text="${category.id}"></td>
+                <td th:text="${category.name}"></td>
+                <td th:text="${category.description}"></td>
+                <td>
+                    <div class="actions">
+                        <a class="button secondary" th:href="@{/categories/{id}/edit(id=${category.id})}">Изменить</a>
+                        <form th:action="@{/categories/{id}/delete(id=${category.id})}" method="post" data-confirm="Удалить категорию?">
+                            <input type="hidden" name="version" th:value="${category.version}">
+                            <button class="danger" type="submit">Удалить</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

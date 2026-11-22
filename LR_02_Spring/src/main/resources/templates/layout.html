@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:fragment="page(title, active, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title + ' - Ювелирный магазин'}">Ювелирный магазин</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script defer th:src="@{/js/forms.js}"></script>
+</head>
+<body>
+<header>
+    <strong>Ювелирный магазин</strong>
+    <nav aria-label="Разделы">
+        <a th:href="@{/products}" th:attr="aria-current=${active == 'products' ? 'page' : null}">Изделия</a>
+        <a th:href="@{/categories}" th:attr="aria-current=${active == 'categories' ? 'page' : null}">Категории</a>
+    </nav>
+</header>
+<main>
+    <h1 th:text="${title}">Ювелирный магазин</h1>
+    <p class="message success" role="status" th:if="${success}" th:text="${success}"></p>
+    <p class="message error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <th:block th:replace="${content}"></th:block>
+</main>
+<footer>Практическая работа №2 | Коновалов Павел, 6131 | Мартынов Олег, 6133</footer>
+</body>
+</html>
